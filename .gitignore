@@ -1,0 +1,9 @@
+artifacts/
+.DS_Store
+.env
+!evidence/**/*.log
+*.log
+mia-fn-single/
+*.pyc
+__pycache__/
+.run-state/

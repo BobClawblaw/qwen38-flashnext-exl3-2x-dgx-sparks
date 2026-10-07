@@ -1,0 +1,51 @@
+url=http://127.0.0.1:8888/v1/chat/completions model=turboderp/Qwen3.8-Flash-Next-exl3 max_tokens=200 runs=3 concurrency=[1, 16] phases=['prose', 'structured']
+phase=prose c=1 run=1 wall=2.12s agg=52.93 tok/s per_stream=[52.95] ttft=[0.339]
+phase=prose c=1 run=2 wall=1.85s agg=52.62 tok/s per_stream=[52.63] ttft=[0.061]
+phase=prose c=1 run=3 wall=1.82s agg=53.52 tok/s per_stream=[53.54] ttft=[0.063]
+phase=prose c=16 run=1 wall=5.54s agg=280.51 tok/s per_stream=[17.53,17.59,17.52,17.51,17.60,17.58,17.53,17.61,17.60,17.49,17.55,17.48,17.56,17.53,17.54,17.62] ttft=[0.174,0.190,0.170,0.167,0.191,0.188,0.176,0.197,0.195,0.166,0.181,0.163,0.187,0.178,0.180,0.199]
+phase=prose c=16 run=2 wall=4.27s agg=368.22 tok/s per_stream=[23.05,23.19,23.06,22.94,22.97,23.10,23.15,22.98,22.95,23.01,23.11,23.13,23.00,23.08,23.06,22.90] ttft=[0.179,0.201,0.182,0.162,0.168,0.190,0.199,0.170,0.165,0.176,0.192,0.196,0.175,0.188,0.185,0.160]
+phase=prose c=16 run=3 wall=4.28s agg=366.74 tok/s per_stream=[23.06,22.98,22.96,22.83,22.90,22.91,23.04,22.87,22.98,22.85,23.01,23.06,22.91,22.99,22.83,22.93] ttft=[0.196,0.182,0.181,0.158,0.171,0.172,0.191,0.167,0.184,0.164,0.189,0.198,0.175,0.187,0.162,0.178]
+phase=structured c=1 run=1 wall=2.04s agg=104.54 tok/s per_stream=[104.56] ttft=[0.133]
+phase=structured c=1 run=2 wall=0.95s agg=227.72 tok/s per_stream=[227.83] ttft=[0.081]
+phase=structured c=1 run=3 wall=0.97s agg=225.16 tok/s per_stream=[225.37] ttft=[0.088]
+phase=structured c=16 run=1 wall=4.34s agg=802.06 tok/s per_stream=[51.35,50.35,48.42,49.84,50.82,49.11,49.59,50.07,48.62,51.82,48.84,49.32,52.06,51.03,51.53,50.54] ttft=[0.459,0.384,0.229,0.344,0.419,0.287,0.326,0.366,0.248,0.497,0.268,0.307,0.515,0.439,0.476,0.403]
+phase=structured c=16 run=2 wall=4.32s agg=801.23 tok/s per_stream=[48.29,50.04,51.58,51.32,52.08,48.76,50.83,48.99,49.50,48.51,49.74,51.04,49.21,51.78,50.54,50.24] ttft=[0.190,0.333,0.450,0.431,0.487,0.230,0.395,0.251,0.291,0.211,0.313,0.413,0.270,0.467,0.375,0.352]
+phase=structured c=16 run=3 wall=4.34s agg=797.62 tok/s per_stream=[48.03,51.36,49.28,48.54,51.10,48.77,50.32,50.55,48.25,51.56,48.99,50.80,49.49,51.79,50.01,49.75] ttft=[0.190,0.457,0.295,0.235,0.438,0.255,0.380,0.398,0.213,0.474,0.275,0.418,0.317,0.493,0.358,0.338]
+SUMMARY [
+  {
+    "phase": "prose",
+    "concurrency": 1,
+    "median_decode_tok_s": 52.94971393264949,
+    "median_ttft_s": 0.06279718700534431,
+    "median_agg_tok_s": 52.928851291825715,
+    "median_completion_tokens": 95,
+    "n": 3
+  },
+  {
+    "phase": "prose",
+    "concurrency": 16,
+    "median_decode_tok_s": 22.92084046925634,
+    "median_ttft_s": 0.18018641600065166,
+    "median_agg_tok_s": 366.7425039036058,
+    "median_completion_tokens": 95.0,
+    "n": 48
+  },
+  {
+    "phase": "structured",
+    "concurrency": 1,
+    "median_decode_tok_s": 225.37148483096914,
+    "median_ttft_s": 0.08836509500542888,
+    "median_agg_tok_s": 225.16131102312988,
+    "median_completion_tokens": 200,
+    "n": 3
+  },
+  {
+    "phase": "structured",
+    "concurrency": 16,
+    "median_decode_tok_s": 50.059510193805764,
+    "median_ttft_s": 0.3553771900005813,
+    "median_agg_tok_s": 801.2334226558928,
+    "median_completion_tokens": 200.0,
+    "n": 48
+  }
+]

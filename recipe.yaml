@@ -1,0 +1,114 @@
+# Source of truth for the values that repeat across run.sh, README.md and CI.
+# Edit here, then `python3 kit/render.py`. CI runs `python3 kit/render.py --check`.
+# Every scalar is used as the string you typed (0.70 stays 0.70). `null` means none.
+# `&name` anchors a value; `*name` reuses it, so a pinned value is written once.
+
+model:
+  id: &model turboderp/Qwen3.8-Flash-Next-exl3
+  revision: &revision 55a732e0c4c3d4614bc42b68493bb930d9b02c0a
+  branch: 4.05bpw_h6_ng6
+  served_name: &served_name turboderp/Qwen3.8-Flash-Next-exl3
+  family: Qwen3.8-Flash-Next
+  params: ~180B total MoE, 512 experts top-10, 1 MTP layer, hashed n-gram (PLE) tables
+  quant: EXL3 (ExLlamaV3 trellis, mul1 codebook) 4.05 bits a weight, head 6 bits, n-gram table 6 bits, MTP head 4 bits
+
+image:
+  base: nvcr.io/nvidia/pytorch:26.07-py3
+  digest: sha256:2140e699b3beaf7f96a0081fd9c9406bc3832b435cdb60dfa2d261f7d2f34a1c
+  local_tag: &image tf-qwen38-flashnext-exl3:0.6.6
+  build: docker/Dockerfile (pip install TensorFold at TF_SHA plus xgrammar 0.2.8 and PyAV 19.0.1 for video input; torch/triton from the base, checked)
+
+engine:
+  name: tensorfold
+  version: 0.6.6
+  repo: https://github.com/ashhart/TensorFold
+  commit: &tf_sha cb2ebf0540f42604e2759b2ddef497861e928248
+  # sha256 of every shipped patch under docker/patches/ (run.sh PATCH_PINS must match; tests/ check the files).
+  patches:
+    flashnext-exl3-0.6.6.patch: 6868816a004c5acb8199648a97af90c5d189c0b316914f9c49fda4937bce91d1
+
+hardware:
+  shape: 2x DGX Spark (GB10)
+  nnodes: 2
+  tp: &tp 2
+
+serve:
+  # The `# BEGIN generated` block of run.sh, in run.sh order. Each key renders as NAME="${NAME:-value}".
+  env:
+    MODEL: *model
+    SERVED_NAME: *served_name
+    IMAGE: *image
+    TF_SHA: *tf_sha
+    TF_PATCH: patches/flashnext-exl3-0.6.6.patch
+    CONTAINER_NAME: tf-qwen38-exl3
+    PORT: 8000
+    MASTER_PORT: 29551
+    HEAD_IP: 10.100.8.1
+    WORKER_HOST: spark2
+    IFACE: enp1s0f1np1
+    HCA: rocep1s0f1,roceP2p1s0f1
+    TP: *tp
+    CONTEXT: 262144
+    KV_DTYPE: int8
+    MTP_DRAFTS: 15
+    MTP_CONFIDENCE: 0.70
+    PARALLEL: 1
+    THINKING: 0
+    MAX_TOKENS: 32768
+    TOOL_SYSTEM: "Tool calls: include only the arguments the user explicitly provided or clearly implied. Never fill in optional arguments with default or guessed values."
+    VISION: 0
+    VISION_URLS: 0
+    VISION_MAX_IMAGES: ""
+    MEMORY_RESERVE_GIB: ""
+    HF_CACHE: $HOME/.cache/huggingface
+    SNAPSHOT_SHA: *revision
+    SKIP_DOWNLOAD: 0
+    TF_CACHE: $HOME/.cache/tensorfold-qwen38-exl3
+    ORCHESTRATE: auto
+    OOM_SCORE_ADJ: 1000
+    MEMGUARD: 1
+    MEMGUARD_MIN_AVAIL_MB: 3072
+    MEMGUARD_MIN_SWAP_FREE_MB: 2048
+    BENCH_ONLY: 0
+    EXTRA_ARGS: ""
+    EXTRA_ENV: ""
+
+readme:
+  # Rows of the README "Defaults" table. {NAME} is replaced by serve.env.NAME.
+  defaults:
+    - Engine: "TensorFold `{TF_SHA}` (v0.6.6), built into `{IMAGE}` from `docker/Dockerfile`"
+    - Patch: "`{TF_PATCH}`: EXL3 packs on two ranks (whole experts a rank, head and projection cuts on Hadamard blocks), YaRN from config.json, a 16-stream EXL3 decode window, plus the MLX recipe's tool, copy-draft and two-rank vision parts (`docker/patches/README.md`)"
+    - Model: "`{MODEL}` branch `4.05bpw_h6_ng6` at `{SNAPSHOT_SHA}` (108 GB; both nodes)"
+    - Profiles: "`PROFILE=serial` (default, one stream on CUDA graphs), `concurrent` (`PARALLEL=16`), `long` (`CONTEXT=1048576` through a YaRN profile folder; short prompts belong on the other two)"
+    - Images: "`VISION={VISION}`: off. `VISION=1` converts the pack's EXL3 vision tower to fp16 once (`$TF_CACHE/<TF_SHA>/vision-f16-v3.safetensors`, a few CPU minutes) and serves `image_url` and `video_url` parts on either profile; rank 0 runs the tower, rank 1 receives each request's features. `VISION_URLS=1` also fetches public https URLs; `VISION_MAX_IMAGES` caps images per request"
+    - Tool system message: "`{TOOL_SYSTEM}` (added by the server to a chat request that offers tools and has no system message; `TOOL_SYSTEM=` serves none)"
+    - Ranks: "`--tp {TP}`: rank 1 on `{WORKER_HOST}` first, then rank 0 (HTTP) on the head; rendezvous `{HEAD_IP}:{MASTER_PORT}`. Each rank holds 256 of the 512 experts, half the attention and DeltaNet heads and half the vocabulary: about 41 GiB"
+    - "`--context`": "{CONTEXT} (the trained window, on both ranks); `PROFILE=long` 1048576"
+    - "`--kv-dtype`": "`{KV_DTYPE}`"
+    - MTP drafts: "`--mtp-drafts {MTP_DRAFTS} --mtp-confidence {MTP_CONFIDENCE}`, plus copy drafts"
+    - "`--parallel`": "{PARALLEL} by default; `PROFILE=concurrent` (or `PARALLEL=16`) serves sixteen streams on two ranks"
+    - Default thinking: "off (`THINKING={THINKING}`); requests override with `chat_template_kwargs.enable_thinking`"
+    - "`--max-tokens`": "{MAX_TOKENS} (the reply cap when a request sets none)"
+    - NCCL: "`NCCL_IB_HCA={HCA}`, `NCCL_SOCKET_IFNAME={IFACE}`"
+    - API: "`http://<head>:{PORT}/v1`, served as `{SERVED_NAME}`"
+    - Container: "`{CONTAINER_NAME}`"
+
+measured:
+  # The README decode table. One row per (phase, concurrency); a row's three numbers come from one
+  # bench_decode.py run. evidence: the file under evidence/ that contains them, or null while there is none.
+  decode:
+    conditions: streamed greedy, thinking off, max_tokens 200 (prose ends at EOS near 100), 3-run median; TensorFold 0.6.6 with the patch at TP=2, PROFILE=concurrent (PARALLEL=16) with VISION=1, context 262144, kv int8, MTP up to 15 drafts at confidence 0.70, one RoCE HCA; the shipped image, started by run.sh
+    units: {decode: tok/s per stream (median), aggregate: tok/s, ttft_p50: s}
+    rows:
+      - {phase: prose, concurrency: 1, decode: 52.9, aggregate: 52.9, ttft_p50: 0.06, evidence: evidence/s1-exl3-tp2/bench-concurrent-c1-c16-image.out}
+      - {phase: prose, concurrency: 16, decode: 22.9, aggregate: 366.7, ttft_p50: 0.18, evidence: evidence/s1-exl3-tp2/bench-concurrent-c1-c16-image.out}
+      - {phase: structured, concurrency: 1, decode: 225.4, aggregate: 225.2, ttft_p50: 0.09, evidence: evidence/s1-exl3-tp2/bench-concurrent-c1-c16-image.out}
+      - {phase: structured, concurrency: 16, decode: 50.1, aggregate: 801.2, ttft_p50: 0.36, evidence: evidence/s1-exl3-tp2/bench-concurrent-c1-c16-image.out}
+
+links:
+  model: https://huggingface.co/turboderp/Qwen3.8-Flash-Next-exl3
+  engine: https://github.com/ashhart/TensorFold
+  base_image: https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch
+  mlx_recipe: https://github.com/BobClawblaw/qwen38-flashnext-tensorfold-2x-dgx-sparks
+  base_recipe: https://github.com/sfxnz/Qwen3.8-Flash-Next-TensorFold-2x-DGX-Spark
+  sibling_vllm: https://github.com/sfxnz/Qwen3.8-Flash-Next-NVFP4-vLLM-2x-DGX-Spark

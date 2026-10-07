@@ -1,0 +1,27 @@
+url=http://127.0.0.1:8889/v1/chat/completions model=exl3 max_tokens=200 runs=3 concurrency=[1] phases=['prose', 'structured']
+phase=prose c=1 run=1 wall=1.77s agg=57.12 tok/s per_stream=[57.13] ttft=[0.125]
+phase=prose c=1 run=2 wall=1.74s agg=55.72 tok/s per_stream=[55.75] ttft=[0.056]
+phase=prose c=1 run=3 wall=1.71s agg=56.72 tok/s per_stream=[56.76] ttft=[0.057]
+phase=structured c=1 run=1 wall=0.96s agg=233.98 tok/s per_stream=[234.08] ttft=[0.111]
+phase=structured c=1 run=2 wall=0.88s agg=242.80 tok/s per_stream=[242.94] ttft=[0.057]
+phase=structured c=1 run=3 wall=0.89s agg=239.14 tok/s per_stream=[239.34] ttft=[0.059]
+SUMMARY [
+  {
+    "phase": "prose",
+    "concurrency": 1,
+    "median_decode_tok_s": 56.76315065735842,
+    "median_ttft_s": 0.057451107997621875,
+    "median_agg_tok_s": 56.721728343038656,
+    "median_completion_tokens": 95,
+    "n": 3
+  },
+  {
+    "phase": "structured",
+    "concurrency": 1,
+    "median_decode_tok_s": 239.33926333808708,
+    "median_ttft_s": 0.058645818004151806,
+    "median_agg_tok_s": 239.14449415061446,
+    "median_completion_tokens": 200,
+    "n": 3
+  }
+]

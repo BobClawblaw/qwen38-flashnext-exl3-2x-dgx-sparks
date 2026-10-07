@@ -1,0 +1,27 @@
+# /etc/systemd/system/qwen38-exl3-tensorfold.service
+# Replace USER and /opt/qwen38-flashnext-exl3-tensorfold with your user and checkout. Then:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now qwen38-exl3-tensorfold
+[Unit]
+Description=Qwen3.8-Flash-Next EXL3 TensorFold TP2 (2x DGX Spark)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+# oneshot + RemainAfterExit: run.sh starts both ranks as detached containers and exits; the unit stays
+# "active (exited)" and ExecStop stops both ranks. Type=simple would restart-loop on run.sh's normal exit.
+Type=oneshot
+RemainAfterExit=yes
+User=USER
+WorkingDirectory=/opt/qwen38-flashnext-exl3-tensorfold
+Environment=HOME=/home/USER
+Environment=PATH=/home/USER/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PROFILE=concurrent
+EnvironmentFile=/opt/qwen38-flashnext-exl3-tensorfold/.env.cluster
+ExecStart=/opt/qwen38-flashnext-exl3-tensorfold/start-systemd.sh
+ExecStop=/opt/qwen38-flashnext-exl3-tensorfold/stop.sh
+Restart=on-failure
+RestartSec=30
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

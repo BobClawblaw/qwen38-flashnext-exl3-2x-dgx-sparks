@@ -1,0 +1,3 @@
+shapes: 150 prompt tokens, 12 reply tokens in 2.4s (prefill 0.9991s incl. the tower, 10 tok/s, sha a7588cf7f668)
+  reply: The image contains a red circle and a blue square.
+  OK

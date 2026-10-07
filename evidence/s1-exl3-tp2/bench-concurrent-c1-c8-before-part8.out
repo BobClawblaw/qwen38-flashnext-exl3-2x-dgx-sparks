@@ -1,0 +1,20 @@
+url=http://127.0.0.1:8889/v1/chat/completions model=exl3 max_tokens=200 runs=3 concurrency=[1, 4, 8, 16] phases=['prose', 'structured']
+phase=prose c=1 run=1 wall=1.89s agg=53.33 tok/s per_stream=[53.35] ttft=[0.125]
+phase=prose c=1 run=2 wall=1.80s agg=53.92 tok/s per_stream=[53.93] ttft=[0.061]
+phase=prose c=1 run=3 wall=1.82s agg=53.52 tok/s per_stream=[53.54] ttft=[0.062]
+phase=prose c=4 run=1 wall=3.46s agg=111.52 tok/s per_stream=[27.86,27.90,27.93,27.87] ttft=[0.080,0.087,0.090,0.084]
+phase=prose c=4 run=2 wall=2.44s agg=161.32 tok/s per_stream=[40.28,40.45,40.32,40.38] ttft=[0.103,0.112,0.105,0.109]
+phase=prose c=4 run=3 wall=2.42s agg=161.31 tok/s per_stream=[40.28,40.43,40.37,40.32] ttft=[0.082,0.090,0.087,0.085]
+phase=prose c=8 run=1 wall=3.18s agg=245.86 tok/s per_stream=[30.69,30.83,30.71,30.80,30.74,30.86,30.76,30.65] ttft=[0.116,0.129,0.119,0.126,0.121,0.132,0.124,0.114]
+phase=prose c=8 run=2 wall=2.97s agg=263.80 tok/s per_stream=[32.92,33.13,33.00,33.03,32.96,33.08,32.92,33.04] ttft=[0.112,0.128,0.120,0.121,0.117,0.125,0.114,0.123]
+phase=prose c=8 run=3 wall=2.97s agg=264.13 tok/s per_stream=[32.94,33.14,33.18,33.10,33.07,33.02,32.98,32.95] ttft=[0.110,0.126,0.129,0.123,0.122,0.118,0.115,0.113]
+Traceback (most recent call last):
+  File "$HOME/qwen38-flashnext-tensorfold/bench_decode.py", line 221, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "$HOME/qwen38-flashnext-tensorfold/bench_decode.py", line 194, in main
+    rows, wall, agg = wave(args.url, args.model, prompt, args.max_tokens, c)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/qwen38-flashnext-tensorfold/bench_decode.py", line 110, in wave
+    raise RuntimeError("a stream returned completion_tokens==0")
+RuntimeError: a stream returned completion_tokens==0

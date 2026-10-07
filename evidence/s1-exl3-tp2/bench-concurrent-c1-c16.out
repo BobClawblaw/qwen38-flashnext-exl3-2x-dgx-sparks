@@ -1,0 +1,51 @@
+url=http://127.0.0.1:8889/v1/chat/completions model=exl3 max_tokens=200 runs=3 concurrency=[1, 16] phases=['prose', 'structured']
+phase=prose c=1 run=1 wall=1.84s agg=54.68 tok/s per_stream=[54.69] ttft=[0.123]
+phase=prose c=1 run=2 wall=1.78s agg=54.62 tok/s per_stream=[54.64] ttft=[0.062]
+phase=prose c=1 run=3 wall=1.81s agg=53.77 tok/s per_stream=[53.78] ttft=[0.062]
+phase=prose c=16 run=1 wall=4.26s agg=367.34 tok/s per_stream=[22.93,23.01,22.91,23.08,22.88,23.09,23.03,22.94,22.89,23.10,23.05,23.00,22.97,23.03,22.95,22.94] ttft=[0.155,0.167,0.153,0.179,0.146,0.181,0.172,0.158,0.151,0.186,0.176,0.169,0.165,0.175,0.162,0.161]
+phase=prose c=16 run=2 wall=4.26s agg=368.96 tok/s per_stream=[23.01,23.12,23.20,22.99,23.13,22.96,23.02,23.08,23.17,23.14,23.02,23.20,23.09,23.15,23.05,23.04] ttft=[0.170,0.188,0.201,0.168,0.191,0.164,0.174,0.184,0.198,0.193,0.175,0.204,0.186,0.195,0.182,0.179]
+phase=prose c=16 run=3 wall=4.24s agg=370.29 tok/s per_stream=[23.06,23.29,23.31,23.11,23.17,23.19,23.12,23.15,23.13,23.20,23.06,23.21,23.07,23.25,23.21,23.23] ttft=[0.158,0.194,0.198,0.167,0.178,0.180,0.170,0.174,0.171,0.182,0.161,0.185,0.164,0.193,0.186,0.190]
+phase=structured c=1 run=1 wall=1.48s agg=147.97 tok/s per_stream=[148.02] ttft=[0.134]
+phase=structured c=1 run=2 wall=0.93s agg=234.71 tok/s per_stream=[234.99] ttft=[0.080]
+phase=structured c=1 run=3 wall=0.93s agg=233.89 tok/s per_stream=[234.13] ttft=[0.081]
+phase=structured c=16 run=1 wall=4.35s agg=803.72 tok/s per_stream=[50.21,50.72,48.50,49.95,49.45,50.44,48.95,48.70,49.19,49.69,52.17,51.44,51.68,51.92,50.94,51.19] ttft=[0.379,0.418,0.243,0.361,0.322,0.398,0.282,0.261,0.301,0.343,0.529,0.477,0.493,0.510,0.438,0.457]
+phase=structured c=16 run=2 wall=4.35s agg=797.79 tok/s per_stream=[48.45,48.21,51.66,48.68,49.36,49.60,50.89,48.89,51.14,50.31,51.37,50.59,51.88,49.09,49.79,50.03] ttft=[0.240,0.220,0.491,0.259,0.317,0.337,0.436,0.280,0.456,0.393,0.473,0.415,0.511,0.296,0.353,0.373]
+phase=structured c=16 run=3 wall=4.35s agg=794.03 tok/s per_stream=[49.36,51.73,48.86,49.83,50.34,48.59,47.90,48.12,50.05,49.06,49.55,50.58,51.10,50.85,48.34,51.38] ttft=[0.306,0.488,0.266,0.345,0.385,0.246,0.187,0.206,0.364,0.285,0.325,0.406,0.445,0.426,0.227,0.467]
+SUMMARY [
+  {
+    "phase": "prose",
+    "concurrency": 1,
+    "median_decode_tok_s": 54.63697086919774,
+    "median_ttft_s": 0.06205979899823433,
+    "median_agg_tok_s": 54.619163994641234,
+    "median_completion_tokens": 95,
+    "n": 3
+  },
+  {
+    "phase": "prose",
+    "concurrency": 16,
+    "median_decode_tok_s": 23.08035654370631,
+    "median_ttft_s": 0.17590587900122046,
+    "median_agg_tok_s": 368.95547038918437,
+    "median_completion_tokens": 95.0,
+    "n": 48
+  },
+  {
+    "phase": "structured",
+    "concurrency": 1,
+    "median_decode_tok_s": 234.1296259579346,
+    "median_ttft_s": 0.08133843100222293,
+    "median_agg_tok_s": 233.89147290538412,
+    "median_completion_tokens": 200,
+    "n": 3
+  },
+  {
+    "phase": "structured",
+    "concurrency": 16,
+    "median_decode_tok_s": 49.986295233735575,
+    "median_ttft_s": 0.36265954350164975,
+    "median_agg_tok_s": 797.7883314975754,
+    "median_completion_tokens": 200.0,
+    "n": 48
+  }
+]

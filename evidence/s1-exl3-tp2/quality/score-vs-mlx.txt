@@ -1,0 +1,63 @@
+{
+ "ref": "$HOME/qwen38-flashnext-tensorfold/evidence/s10-tf066/quality/t2",
+ "cand": "$HOME/projects/data/qwen38-evals/runs/exl3-tp2-concurrent-20261007-1344",
+ "gate": "T2",
+ "verdict": "PASS",
+ "pass": true,
+ "checks": {
+  "effort": true,
+  "gsm8k": true,
+  "ifeval": true,
+  "rep4": true,
+  "tools": true
+ },
+ "tasks": {
+  "effort": {
+   "n": 5,
+   "ref_acc": 1.0,
+   "cand_acc": 1.0,
+   "drop_pp": 0.0,
+   "lost": 0,
+   "gained": 0,
+   "p": 1.0,
+   "rule": "5/5 must be all correct"
+  },
+  "gsm8k": {
+   "n": 250,
+   "ref_acc": 0.956,
+   "cand_acc": 0.956,
+   "drop_pp": 0.0,
+   "lost": 2,
+   "gained": 2,
+   "p": 1.0,
+   "rule": "McNemar p >= 0.05 and drop <= 2.0 pp"
+  },
+  "ifeval": {
+   "n": 120,
+   "ref_acc": 0.85,
+   "cand_acc": 0.858333,
+   "drop_pp": -0.833,
+   "lost": 6,
+   "gained": 7,
+   "p": 1.0,
+   "rule": "McNemar p >= 0.05 and drop <= 2.0 pp"
+  },
+  "rep4": {
+   "n": 64,
+   "ref": 0.000412,
+   "cand": 0.000482,
+   "abs_diff": 7e-05,
+   "tolerance": 0.005
+  },
+  "tools": {
+   "n": 60,
+   "ref_acc": 1.0,
+   "cand_acc": 1.0,
+   "drop_pp": 0.0,
+   "lost": 0,
+   "gained": 0,
+   "p": 1.0,
+   "rule": "60/60 must be all correct"
+  }
+ }
+}

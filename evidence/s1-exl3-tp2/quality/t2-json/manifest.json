@@ -1,0 +1,51 @@
+{
+ "tool": "t2",
+ "utc": "20261007T140520Z",
+ "argv": [
+  "$HOME/qwen38-flashnext-exl3-tensorfold/quality/t2.py",
+  "--url",
+  "http://127.0.0.1:8888",
+  "--model",
+  "turboderp/Qwen3.8-Flash-Next-exl3",
+  "--out",
+  "$HOME/projects/data/qwen38-evals/runs/exl3-tp2-serial-json-20261007-1405",
+  "--tasks",
+  "json",
+  "--workers",
+  "1"
+ ],
+ "args": {
+  "url": "http://127.0.0.1:8888",
+  "model": "turboderp/Qwen3.8-Flash-Next-exl3",
+  "out": "$HOME/projects/data/qwen38-evals/runs/exl3-tp2-serial-json-20261007-1405",
+  "tasks": "json",
+  "limit": 0,
+  "workers": 1
+ },
+ "git": {
+  "rev": "04aa3b0feba6cb2c7d20f6220ac57b1478e87ed3",
+  "branch": "master",
+  "dirty": false
+ },
+ "host": "head",
+ "server": "http://127.0.0.1:8888",
+ "models": {
+  "object": "list",
+  "data": [
+   {
+    "id": "turboderp/Qwen3.8-Flash-Next-exl3",
+    "object": "model",
+    "owned_by": "tensorfold"
+   }
+  ]
+ },
+ "sha256": {
+  "quality/data/t2_ids.json": "4579ad861db7df3fb3c5357bd4f194c79b29bfd2d6fc45ca14036ae958dc7853",
+  "quality/data/tools.json": "04b69f8c6a39ce100fab19842d71343f20dc84785db2fcde4dbb3d62a5b0c198",
+  "quality/ifeval.py": "b68f7bb53858c2bebcc0738e01b3213f675ea96f9b82dd0773f544e8cb8b9afb",
+  "quality/qlib.py": "9f9f051d9cfeadade87b1cfac461771e17336947389c809c5cb2665a8001028b",
+  "quality/score.py": "809a7a60d9dc8fcd5e062c074c93b775d0da7ccace42e245f9396420c1e90bac",
+  "quality/t2.py": "2d95d9f87118bcbf16726db365bfa97ca8b0860c814d4f0fd2dd26f6d6f397dd",
+  "quality/t3_needles.py": "5a9eb792276f24fba5b2fc12f51449e31d88afc91b48d55bf749322a153436d3"
+ }
+}

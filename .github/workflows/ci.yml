@@ -1,0 +1,79 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ENV_CLUSTER: /dev/null   # the shipped defaults, not a cluster's .env.cluster
+
+jobs:
+  validate-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: run.sh dry-run with the shipped defaults
+        run: VALIDATE_ONLY=1 ./run.sh
+      - name: run.sh dry-run, single rank control
+        run: VALIDATE_ONLY=1 TP=1 CONTEXT=65536 ./run.sh
+      - name: run.sh dry-run, concurrent profile (eight streams)
+        run: VALIDATE_ONLY=1 PROFILE=concurrent ./run.sh
+      - name: run.sh dry-run, --parallel at TP=2 (TensorFold 0.6.4+ serves it)
+        run: VALIDATE_ONLY=1 PARALLEL=4 ./run.sh
+      - name: run.sh refuses a window above the trained 262144 on the plain profiles
+        run: |
+          if VALIDATE_ONLY=1 CONTEXT=524288 ./run.sh; then
+            echo "run.sh accepted CONTEXT=524288" >&2
+            exit 1
+          fi
+      - name: run.sh serves 1048576 on the long profile and refuses more
+        run: |
+          VALIDATE_ONLY=1 PROFILE=long ./run.sh | grep -q "ctx=1048576"
+          if VALIDATE_ONLY=1 PROFILE=long CONTEXT=1048577 ./run.sh; then
+            echo "run.sh accepted CONTEXT=1048577" >&2
+            exit 1
+          fi
+      - name: run.sh refuses EXTRA_ARGS that re-set an owned flag
+        run: |
+          if VALIDATE_ONLY=1 EXTRA_ARGS="--mtp-drafts 3" ./run.sh; then
+            echo "run.sh accepted --mtp-drafts in EXTRA_ARGS" >&2
+            exit 1
+          fi
+      - name: run.sh owns --vision (VISION=1 is the switch, either profile)
+        run: |
+          if VALIDATE_ONLY=1 EXTRA_ARGS="--vision" ./run.sh; then
+            echo "run.sh accepted --vision in EXTRA_ARGS" >&2
+            exit 1
+          fi
+          VALIDATE_ONLY=1 VISION=1 ./run.sh
+          VALIDATE_ONLY=1 VISION=1 PROFILE=concurrent ./run.sh
+      - name: run.sh refuses zero-padded integers
+        run: |
+          if VALIDATE_ONLY=1 MAX_TOKENS=04096 ./run.sh; then
+            echo "run.sh accepted MAX_TOKENS=04096" >&2
+            exit 1
+          fi
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - run: shellcheck -S warning run.sh stop.sh tools/session_gate.sh tools/sweep.sh tools/run_t3.sh
+
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -q

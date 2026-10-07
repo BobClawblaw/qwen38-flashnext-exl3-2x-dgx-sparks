@@ -1,0 +1,27 @@
+url=http://127.0.0.1:8888/v1/chat/completions model=turboderp/Qwen3.8-Flash-Next-exl3 max_tokens=200 runs=3 concurrency=[1] phases=['prose', 'structured']
+phase=prose c=1 run=1 wall=1.79s agg=56.09 tok/s per_stream=[56.11] ttft=[0.114]
+phase=prose c=1 run=2 wall=1.70s agg=57.06 tok/s per_stream=[57.09] ttft=[0.055]
+phase=prose c=1 run=3 wall=1.74s agg=56.69 tok/s per_stream=[56.71] ttft=[0.077]
+phase=structured c=1 run=1 wall=0.98s agg=230.97 tok/s per_stream=[231.16] ttft=[0.121]
+phase=structured c=1 run=2 wall=0.93s agg=230.21 tok/s per_stream=[230.38] ttft=[0.071]
+phase=structured c=1 run=3 wall=0.91s agg=235.96 tok/s per_stream=[236.22] ttft=[0.068]
+SUMMARY [
+  {
+    "phase": "prose",
+    "concurrency": 1,
+    "median_decode_tok_s": 56.71235749832366,
+    "median_ttft_s": 0.07683549699868308,
+    "median_agg_tok_s": 56.68888059439433,
+    "median_completion_tokens": 95,
+    "n": 3
+  },
+  {
+    "phase": "structured",
+    "concurrency": 1,
+    "median_decode_tok_s": 231.15567614958437,
+    "median_ttft_s": 0.07050363199959975,
+    "median_agg_tok_s": 230.97006714386353,
+    "median_completion_tokens": 200,
+    "n": 3
+  }
+]

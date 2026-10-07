@@ -1,0 +1,14 @@
+Two ranks against one GPU, the same 4.05 bpw pack, greedy, max_tokens 300 (texts-two-ranks.json, texts-one-gpu.json).
+
+prompt 0: identical
+  drafted == undrafted on two ranks: True; on one GPU: True
+prompt 1: identical
+  drafted == undrafted on two ranks: True; on one GPU: True
+prompt 2: diverge at character 447 of 872 / 910
+  drafted == undrafted on two ranks: True; on one GPU: True
+prompt 3: identical
+  drafted == undrafted on two ranks: True; on one GPU: True
+prompt 4: diverge at character 158 of 958 / 908
+  drafted == undrafted on two ranks: True; on one GPU: True
+prompt 5: identical
+  drafted == undrafted on two ranks: True; on one GPU: True
