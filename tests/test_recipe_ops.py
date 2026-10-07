@@ -186,6 +186,25 @@ class GuardTests(unittest.TestCase):
         self.assertIn("host=127.0.0.1", self.accepted(BENCH_ONLY="1").stdout)
         self.assertIn("host=0.0.0.0", self.accepted().stdout)
 
+    def test_a_start_waits_out_the_settle_after_a_stop(self) -> None:
+        # stop.sh stamps the stop; run.sh sleeps the remainder of SETTLE_SECONDS before rank 1 starts (systemctl restart).
+        run, stop = _read("run.sh"), _read("stop.sh")
+        self.assertIn('date +%s >"$SCRIPT_DIR/.run-state/stopped_at"', stop)
+        self.assertLess(run.index("settle_after_stop\n    log \"Starting rank 1 on"), run.index('start_local 0\n  wait_ready "$watch_worker"'))
+        script = "set -euo pipefail\nlog() { echo \"$*\"; }\n" + _func_src(run, "settle_after_stop")
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp) / ".run-state"; state.mkdir()
+            (state / "stopped_at").write_text(str(int(__import__("time").time()) - 28))
+            t0 = __import__("time").time()
+            out = subprocess.run(["bash", "-c", script + f"STATE_DIR={shlex.quote(str(state))}\nSETTLE_SECONDS=30\nsettle_after_stop\n"],
+                                 check=True, capture_output=True, text=True).stdout
+            self.assertIn("more after the last stop", out)
+            self.assertGreaterEqual(__import__("time").time() - t0, 1.5)
+            (state / "stopped_at").write_text("0")
+            out = subprocess.run(["bash", "-c", script + f"STATE_DIR={shlex.quote(str(state))}\nsettle_after_stop\n"],
+                                 check=True, capture_output=True, text=True).stdout
+            self.assertEqual(out, "")
+
     def test_every_refusal_precedes_validate_only_exit(self) -> None:
         run = _read("run.sh")
         exit_at = run.index('if [[ "${VALIDATE_ONLY:-0}" == "1" ]]')

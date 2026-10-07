@@ -28,6 +28,9 @@ stop_local() {
 host_short() { hostname -s | tr '[:upper:]' '[:lower:]'; }
 
 stop_local
+# When this pair stopped: run.sh waits out SETTLE_SECONDS from here before it starts a rank again (a start within
+# seconds of a stop refused NCCL's first memory registration on the worker; `systemctl restart` does exactly that).
+mkdir -p "$SCRIPT_DIR/.run-state" && date +%s >"$SCRIPT_DIR/.run-state/stopped_at"
 
 if [[ "$ORCHESTRATE" == "0" ]]; then
   exit 0

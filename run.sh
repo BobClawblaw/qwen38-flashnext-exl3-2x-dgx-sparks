@@ -395,6 +395,18 @@ serve_args() {
   printf '%s\n' "${args[@]}"
 }
 
+settle_after_stop() {
+  # stop.sh stamps the time it stopped the pair. A rank started within SETTLE_SECONDS of that refused NCCL's first
+  # memory registration on the worker (ibv_reg_mr_iova2: Cannot allocate memory; seen on `systemctl restart`, whose
+  # ExecStop runs stop.sh right before ExecStart). Wait out the remainder; SETTLE_SECONDS=0 skips it.
+  local stamp="$STATE_DIR/stopped_at" settle="${SETTLE_SECONDS:-30}" since
+  [[ -f "$stamp" ]] || return 0
+  since=$(( $(date +%s) - $(cat "$stamp" 2>/dev/null || echo 0) ))
+  (( since >= settle )) && return 0
+  log "Waiting $(( settle - since ))s more after the last stop for the ranks' memory to settle"
+  sleep $(( settle - since ))
+}
+
 ensure_long_profile() {
   # PROFILE=long: a folder of links to the snapshot's files (container paths) with its own config.json:
   # Qwen's YaRN block in rope_parameters and max_position_embeddings at the served window. The pack's bytes are
@@ -606,6 +618,7 @@ if [[ "$ORCHESTRATE" == "auto" && "$ROLE" == "head" ]]; then
     printf '%s\n' "$WORKER_HOST" >"$STATE_DIR/worker_host"
     ensure_weights                 # the head's own snapshot, before rank 1 starts and waits on it
     sync_worker_image
+    settle_after_stop
     log "Starting rank 1 on $WORKER_HOST first"
     scp -q "$0" "${WORKER_HOST}:/tmp/${CONTAINER_NAME}-run.sh"
     ssh "$WORKER_HOST" "$(worker_env) bash /tmp/${CONTAINER_NAME}-run.sh"
@@ -622,6 +635,7 @@ elif [[ "$ROLE" == "worker" ]]; then
   start_local 1
   log "Rank 1 is up and waits for rank 0 at $HEAD_IP:$MASTER_PORT."
 else
+  settle_after_stop
   start_local 0
   wait_ready 0
   log "Stop with: ./stop.sh"
